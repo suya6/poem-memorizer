@@ -1,100 +1,51 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>古诗背诵助手</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-      background: #f9f7f0;
-      padding: 15px;
-      color: #333;
-    }
-    .container { max-width: 600px; margin: 0 auto; }
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      margin: 15px 0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-    textarea {
-      width: 100%;
-      height: 100px;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      font-size: 16px;
-      resize: vertical;
-    }
-    button {
-      background: #3498db;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 10px;
-      font-size: 16px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-    button:hover { background: #2980b9; }
-    .original { font-size: 20px; line-height: 1.6; margin: 10px 0; }
-    .translation { color: #e74c3c; margin: 10px 0; font-size: 16px; }
-    .keypoint {
-      display: inline-block;
-      background: #fff8e1;
-      padding: 4px 10px;
-      border-radius: 6px;
-      margin: 4px 4px 4px 0;
-      font-size: 14px;
-    }
-    img {
-      width: 100%;
-      border-radius: 10px;
-      margin: 15px 0;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="card">
-      <h2>📖 古诗背诵助手</h2>
-      <textarea id="poemInput" placeholder="粘贴你要背的古诗文，例如《桃花源记》..."></textarea>
-      <br>
-      <button onclick="loadPoem()">加载古诗</button>
-    </div>
+<!-- M1: 确认原文模块 -->
+<div class="card">
+  <h3>📚 选择或粘贴要背诵的古文</h3>
+  
+  <!-- 下拉选择预置篇目 -->
+  <label>选择篇目：</label>
+  <select id="poemSelect" style="width:100%; padding:8px; margin:8px 0; border-radius:6px;">
+    <option value="">-- 请选择或手动粘贴 --</option>
+    <option value="晋太元中，武陵人捕鱼为业，缘溪行，忘路之远近。忽逢桃花林，夹岸数百步，中无杂树，芳草鲜美，落英缤纷。渔人甚异之，复前行，欲穷其林。">《桃花源记》（节选）</option>
+    <option value="庆历四年春，滕子京谪守巴陵郡。越明年，政通人和，百废具兴...">《岳阳楼记》（节选）</option>
+    <option value="予独爱莲之出淤泥而不染，濯清涟而不妖...">《爱莲说》</option>
+    <!-- 可继续添加更多 -->
+  </select>
 
-    <div class="card" id="poemCard" style="display:none;">
-      <!-- 示例图：桃花源记 -->
-      <img src="https://img2.baidu.com/it/u=1428233185,2841188393&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=300" alt="插图">
-      <div class="original" id="originalText">缘溪行，忘路之远近。</div>
-      <div class="translation" id="translationText">宝子们注意啦！沿着小溪走，totally 忘了走了多远～</div>
-      <div>
-        <span class="keypoint">【缘：沿着】</span>
-        <span class="keypoint">【忘：忘记】</span>
-      </div>
-      <button onclick="startRecord()">🎤 开始背诵</button>
-    </div>
-  </div>
+  <!-- 手动粘贴 -->
+  <label>或粘贴原文：</label>
+  <textarea id="manualInput" placeholder="在此粘贴全文..." rows="4" style="width:100%; padding:10px; border-radius:6px;"></textarea>
 
-  <script>
-    function loadPoem() {
-      const input = document.getElementById('poemInput').value.trim();
-      if (input) {
-        // 这里可以未来做分段，现在先显示示例
-        document.getElementById('poemCard').style.display = 'block';
-        // 滚动到卡片
-        document.getElementById('poemCard').scrollIntoView({ behavior: 'smooth' });
-      } else {
-        alert("请先输入古诗文哦！");
-      }
-    }
+  <button onclick="confirmYuanwen()">✅ 确认原文</button>
+</div>
 
-    function startRecord() {
-      alert("语音跟读功能正在开发中～\n现在你可以大声背出来，超棒的！✨");
-    }
-  </script>
-</body>
-</html>
+<script>
+// 全局变量：存储最终确认的原文
+window.yuanwen = "";
+
+function confirmYuanwen() {
+  const selectVal = document.getElementById('poemSelect').value;
+  const manualVal = document.getElementById('manualInput').value.trim();
+
+  let finalText = "";
+
+  if (manualVal) {
+    // 优先使用手动粘贴内容
+    finalText = manualVal;
+  } else if (selectVal) {
+    // 使用下拉选择内容
+    finalText = selectVal;
+  } else {
+    alert("请先选择一篇古文或粘贴原文！");
+    return;
+  }
+
+  // 存入全局变量
+  window.yuanwen = finalText;
+
+  // 可选：显示确认信息
+  alert("原文已确认！共 " + finalText.length + " 字。\n\n开始分段背诵吧～");
+
+  // TODO: 这里后续可调用分段函数 autoSegment(window.yuanwen)
+}
+</script>
