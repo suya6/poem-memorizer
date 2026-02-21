@@ -1,97 +1,157 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>古诗背诵</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>古诗背诵助手</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f9f7f0;
+      padding: 15px;
+      color: #333;
+      line-height: 1.6;
+    }
+    .container { max-width: 600px; margin: 0 auto; }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin: 15px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    h3 {
+      margin-bottom: 15px;
+      color: #2c3e50;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+      color: #555;
+    }
+    select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      font-family: inherit;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    #previewArea {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 15px 0;
+      display: none;
+    }
+    #previewText {
+      white-space: pre-wrap;
+      line-height: 1.7;
+      color: #333;
+    }
+    button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+    button:disabled {
+      background: #bdc3c7;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) {
+      background: #2980b9;
+    }
+  </style>
 </head>
-<body style="font-family: sans-serif; padding: 20px; background: #f0f0f0;">
-  <h2>🎉 恭喜！你的网页已成功创建！</h2>
-  <p>这是你的第一个古诗背诵助手页面。</p>
-  <button onclick="alert('语音功能即将上线！')">🎤 测试按钮</button>
-</body>
-</html>
-<!-- M1: 确认原文模块 -->
-<div class="card">
-  <h3>📚 选择或粘贴要背诵的古文</h3>
-  
-  <!-- 下拉选择预置篇目 -->
-  <label>选择篇目：</label>
-  <select id="poemSelect" style="width:100%; padding:8px; margin:8px 0; border-radius:6px;">
-    <option value="">-- 请选择 --</option>
-    <option value="晋太元中，武陵人捕鱼为业，缘溪行，忘路之远近。忽逢桃花林，夹岸数百步，中无杂树，芳草鲜美，落英缤纷。渔人甚异之，复前行，欲穷其林。">《桃花源记》（节选）</option>
-    <option value="庆历四年春，滕子京谪守巴陵郡。越明年，政通人和，百废具兴，乃重修岳阳楼...">《岳阳楼记》（节选）</option>
-    <option value="予独爱莲之出淤泥而不染，濯清涟而不妖，中通外直，不蔓不枝...">《爱莲说》</option>
-    <!-- 可继续添加更多 -->
-  </select>
+<body>
+  <div class="container">
+    <!-- M1: 确认原文模块 -->
+    <div class="card">
+      <h3>📚 选择或粘贴要背诵的古文</h3>
+      
+      <label>选择篇目：</label>
+      <select id="poemSelect">
+        <option value="">-- 请选择 --</option>
+        <option value="晋太元中，武陵人捕鱼为业，缘溪行，忘路之远近。忽逢桃花林，夹岸数百步，中无杂树，芳草鲜美，落英缤纷。渔人甚异之，复前行，欲穷其林。">《桃花源记》（节选）</option>
+        <option value="庆历四年春，滕子京谪守巴陵郡。越明年，政通人和，百废具兴，乃重修岳阳楼，增其旧制，刻唐贤今人诗赋于其上...">《岳阳楼记》（节选）</option>
+        <option value="予独爱莲之出淤泥而不染，濯清涟而不妖，中通外直，不蔓不枝，香远益清，亭亭净植...">《爱莲说》</option>
+        <option value="山不在高，有仙则名。水不在深，有龙则灵。斯是陋室，惟吾德馨...">《陋室铭》</option>
+        <option value="从小丘西行百二十步，隔篁竹，闻水声，如鸣珮环，心乐之...">《小石潭记》（节选）</option>
+      </select>
 
-  <!-- 手动粘贴 -->
-  <label>或粘贴原文：</label>
-  <textarea id="manualInput" placeholder="在此粘贴全文..." rows="4" style="width:100%; padding:10px; border-radius:6px; margin:8px 0;"></textarea>
+      <label>或粘贴原文：</label>
+      <textarea id="manualInput" placeholder="在此粘贴全文..."></textarea>
 
-  <!-- 原文预览区 -->
-  <div id="previewArea" style="background:#f8f9fa; padding:12px; border-radius:8px; margin:15px 0; min-height:60px; display:none;">
-    <strong>预览原文：</strong>
-    <div id="previewText" style="margin-top:8px; white-space:pre-wrap; line-height:1.6;"></div>
+      <div id="previewArea">
+        <strong>预览原文：</strong>
+        <div id="previewText"></div>
+      </div>
+
+      <button id="confirmBtn" disabled>✅ 确认原文</button>
+    </div>
+
+    <!-- 后续模块（M2-M6）将在这里添加 -->
   </div>
 
-  <!-- 确认按钮（初始禁用） -->
-  <button id="confirmBtn" onclick="confirmYuanwen()" disabled style="background:#ccc;">✅ 确认原文</button>
-</div>
+  <script>
+    // 全局变量：存储用户最终确认的原文
+    window.yuanwen = "";
 
-<script>
-// 全局变量
-window.yuanwen = "";
+    // 监听输入变化，更新预览
+    document.getElementById('poemSelect').addEventListener('change', updatePreview);
+    document.getElementById('manualInput').addEventListener('input', updatePreview);
 
-// 监听下拉框和文本域变化
-document.getElementById('poemSelect').addEventListener('change', updatePreview);
-document.getElementById('manualInput').addEventListener('input', updatePreview);
+    function updatePreview() {
+      const selectVal = document.getElementById('poemSelect').value;
+      const manualVal = document.getElementById('manualInput').value.trim();
+      const previewArea = document.getElementById('previewArea');
+      const previewText = document.getElementById('previewText');
+      const confirmBtn = document.getElementById('confirmBtn');
 
-function updatePreview() {
-  const selectVal = document.getElementById('poemSelect').value;
-  const manualVal = document.getElementById('manualInput').value.trim();
-  const previewArea = document.getElementById('previewArea');
-  const previewText = document.getElementById('previewText');
-  const confirmBtn = document.getElementById('confirmBtn');
+      let textToShow = manualVal || selectVal;
 
-  let textToShow = '';
+      if (textToShow) {
+        previewText.textContent = textToShow;
+        previewArea.style.display = 'block';
+        confirmBtn.disabled = false;
+      } else {
+        previewArea.style.display = 'none';
+        confirmBtn.disabled = true;
+      }
+    }
 
-  // 优先显示手动输入内容（如果有的话）
-  if (manualVal) {
-    textToShow = manualVal;
-  } else if (selectVal) {
-    textToShow = selectVal;
-  }
+    // 确认原文
+    function confirmYuanwen() {
+      const selectVal = document.getElementById('poemSelect').value;
+      const manualVal = document.getElementById('manualInput').value.trim();
+      const finalText = manualVal || selectVal;
 
-  if (textToShow) {
-    previewText.textContent = textToShow;
-    previewArea.style.display = 'block';
-    confirmBtn.disabled = false;
-    confirmBtn.style.background = '#3498db';
-  } else {
-    previewArea.style.display = 'none';
-    confirmBtn.disabled = true;
-    confirmBtn.style.background = '#ccc';
-  }
-}
+      if (!finalText) {
+        alert("请先选择或输入古文！");
+        return;
+      }
 
-function confirmYuanwen() {
-  const selectVal = document.getElementById('poemSelect').value;
-  const manualVal = document.getElementById('manualInput').value.trim();
+      window.yuanwen = finalText;
+      alert(`✅ 原文已确认！共 ${finalText.length} 字。\n\n接下来将进入分段背诵流程。`);
+      
+      // TODO: 这里后续调用分段函数，例如：
+      // startSegmentation(window.yuanwen);
+    }
 
-  // 再次获取最终文本（防止用户改了没触发 preview）
-  let finalText = manualVal || selectVal;
-
-  if (!finalText) {
-    alert("请先选择或输入古文！");
-    return;
-  }
-
-  window.yuanwen = finalText;
-
-  // 可选：高亮提示已确认
-  alert("✅ 原文已确认！共 " + finalText.length + " 字。\n\n接下来将进入分段背诵流程。");
-
-  // TODO: 这里后续可调用 autoSegment(window.yuanwen)
-}
-</script>
+    // 绑定确认按钮点击事件
+    document.getElementById('confirmBtn').onclick = confirmYuanwen;
+  </script>
+</body>
+</html>
