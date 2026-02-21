@@ -152,40 +152,46 @@
   }
 
   // === M2: 自动分段 ===
-  function autoSegment(text) {
-    if (!text || typeof text !== 'string') return [];
-    text = text.trim();
-    const parts = text.split(/([。；！？])/).filter(p => p.trim() !== '');
-    const sentences = [];
-    for (let i = 0; i < parts.length; i++) {
-      if (/[。；！？]/.test(parts[i]) && sentences.length > 0) {
-        sentences[sentences.length - 1] += parts[i];
+  /**
+ * 自动分段：优先按自然段，最多7段
+ * @param {string} text - 原文（可能含 \n\n）
+ * @returns {string[]} 分段数组
+ */
+function autoSegment(text) {
+  if (!text || typeof text !== 'string') return [];
+
+  // 第一步：按自然段分割（\n\n 或 \n）
+  let paragraphs = text.split(/\n\s*\n/).filter(p => p.trim() !== '');
+  
+  // 如果没有自然段（如一整段），则按句号切分
+  if (paragraphs.length === 1 && paragraphs[0].length === text.trim().length) {
+    const sentences = text.split(/([。；！？])/).filter(s => s.trim() !== '');
+    const fullSentences = [];
+    for (let i = 0; i < sentences.length; i++) {
+      if (/[。；！？]/.test(sentences[i]) && fullSentences.length > 0) {
+        fullSentences[fullSentences.length - 1] += sentences[i];
       } else {
-        sentences.push(parts[i]);
+        fullSentences.push(sentences[i]);
       }
     }
-    const totalChars = text.length;
-    const maxSegments = 7;
-    const idealMaxLength = Math.ceil(totalChars / maxSegments);
-    const maxLength = Math.max(idealMaxLength, 50);
-    const segments = [];
+    
+    // 合并短句成段（每段 ≤80字）
+    paragraphs = [];
     let current = '';
-    for (const sent of sentences) {
-      if ((current + sent).length <= maxLength) {
+    for (const sent of fullSentences) {
+      if ((current + sent).length <= 80) {
         current += sent;
       } else {
-        if (current) segments.push(current);
+        if (current) paragraphs.push(current);
         current = sent;
       }
-      if (segments.length >= maxSegments - 1) {
-        const remaining = [current, ...sentences.slice(sentences.indexOf(sent) + 1)].join('');
-        segments.push(remaining);
-        return segments.slice(0, maxSegments);
-      }
     }
-    if (current) segments.push(current);
-    return segments.slice(0, maxSegments);
+    if (current) paragraphs.push(current);
   }
+
+  // 最多返回7段
+  return paragraphs.slice(0, 7);
+}
 
   // === 初始化事件监听 ===
   document.addEventListener('DOMContentLoaded', () => {
