@@ -110,7 +110,23 @@
   window.yuanwen = "";
 
   // === M1: 原文确认 ===
-  function updatePreview() { ... }
+  function updatePreview() {
+      const selectVal = document.getElementById('poemSelect').value;
+      const manualVal = document.getElementById('manualInput').value.trim();
+      const previewArea = document.getElementById('previewArea');
+      const previewText = document.getElementById('previewText');
+      const confirmBtn = document.getElementById('confirmBtn');
+
+      let textToShow = manualVal || selectVal;
+
+      if (textToShow) {
+        previewText.textContent = textToShow;
+        previewArea.style.display = 'block';
+        confirmBtn.disabled = false;
+      } else {
+        previewArea.style.display = 'none';
+        confirmBtn.disabled = true;
+      }
  function confirmYuanwen() {
   const selectVal = document.getElementById('poemSelect').value;
   const manualVal = document.getElementById('manualInput').value.trim();
