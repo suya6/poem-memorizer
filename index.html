@@ -105,53 +105,23 @@
     <!-- 后续模块（M2-M6）将在这里添加 -->
   </div>
 
-  <script>
-    // 全局变量：存储用户最终确认的原文
-    window.yuanwen = "";
+ <script>
+  // === 全局变量 ===
+  window.yuanwen = "";
 
-    // 监听输入变化，更新预览
+  // === M1: 原文确认 ===
+  function updatePreview() { ... }
+  function confirmYuanwen() { ... }
+
+  // === M2: 自动分段 ===
+  function autoSegment(text) { ... }
+
+  // === 初始化事件监听 ===
+  document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('poemSelect').addEventListener('change', updatePreview);
     document.getElementById('manualInput').addEventListener('input', updatePreview);
-
-    function updatePreview() {
-      const selectVal = document.getElementById('poemSelect').value;
-      const manualVal = document.getElementById('manualInput').value.trim();
-      const previewArea = document.getElementById('previewArea');
-      const previewText = document.getElementById('previewText');
-      const confirmBtn = document.getElementById('confirmBtn');
-
-      let textToShow = manualVal || selectVal;
-
-      if (textToShow) {
-        previewText.textContent = textToShow;
-        previewArea.style.display = 'block';
-        confirmBtn.disabled = false;
-      } else {
-        previewArea.style.display = 'none';
-        confirmBtn.disabled = true;
-      }
-    }
-
-    // 确认原文
-    function confirmYuanwen() {
-      const selectVal = document.getElementById('poemSelect').value;
-      const manualVal = document.getElementById('manualInput').value.trim();
-      const finalText = manualVal || selectVal;
-
-      if (!finalText) {
-        alert("请先选择或输入古文！");
-        return;
-      }
-
-      window.yuanwen = finalText;
-      alert(`✅ 原文已确认！共 ${finalText.length} 字。\n\n接下来将进入分段背诵流程。`);
-      
-      // TODO: 这里后续调用分段函数，例如：
-      // startSegmentation(window.yuanwen);
-    }
-
-    // 绑定确认按钮点击事件
     document.getElementById('confirmBtn').onclick = confirmYuanwen;
-  </script>
+  });
+</script>
 </body>
 </html>
