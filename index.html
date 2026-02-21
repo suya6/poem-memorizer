@@ -92,7 +92,9 @@
 
 既出，得其船，便扶向路，处处志之。及郡下，诣太守，说如此。太守即遣人随其往，寻向所志，遂迷，不复得路。
 
-南阳刘子骥，高尚士也，闻之，欣然规往。未果，寻病终。后遂无问津者。">《桃花源记》</option>
+南阳刘子骥，高尚士也，闻之，欣然规往。未果，寻病终。后遂无问津者。
+
+">《桃花源记》</option>
         <option value="庆历四年春，滕子京谪守巴陵郡。越明年，政通人和，百废具兴，乃重修岳阳楼，增其旧制，刻唐贤今人诗赋于其上...">《岳阳楼记》（节选）</option>
         <option value="予独爱莲之出淤泥而不染，濯清涟而不妖，中通外直，不蔓不枝，香远益清，亭亭净植...">《爱莲说》</option>
         <option value="山不在高，有仙则名。水不在深，有龙则灵。斯是陋室，惟吾德馨...">《陋室铭》</option>
@@ -113,10 +115,8 @@
     <!-- 后续模块（M2-M6）将在这里添加 -->
   </div>
 <script>
-  // === 全局变量 ===
   window.yuanwen = "";
 
-  // === M1: 原文确认 ===
   function updatePreview() {
     const selectVal = document.getElementById('poemSelect').value;
     const manualVal = document.getElementById('manualInput').value.trim();
@@ -124,7 +124,7 @@
     const previewText = document.getElementById('previewText');
     const confirmBtn = document.getElementById('confirmBtn');
 
-    let textToShow = manualVal || selectVal;
+    const textToShow = manualVal || selectVal;
 
     if (textToShow) {
       previewText.textContent = textToShow;
@@ -134,7 +134,7 @@
       previewArea.style.display = 'none';
       confirmBtn.disabled = true;
     }
-  } // ✅ 关键：补上这个 }
+  }
 
   function confirmYuanwen() {
     const selectVal = document.getElementById('poemSelect').value;
@@ -147,62 +147,27 @@
     }
 
     window.yuanwen = finalText;
-    const segments = autoSegment(window.yuanwen);
+    const segments = autoSegment(finalText);
     
-    console.log("原文总字数:", finalText.length);
-    console.log("分段结果（共" + segments.length + "段）:", segments);
+    console.log("✅ 原文已确认");
+    console.log("总字数:", finalText.length);
+    console.log("分段数量:", segments.length);
+    console.log("分段结果:", segments);
     
-    alert(`✅ 原文已确认！\n总字数：${finalText.length}\n分为：${segments.length} 段\n\n请按 F12 查看详细分段。`);
+    alert(`✅ 原文已确认！\n总字数：${finalText.length}\n共分为：${segments.length} 段`);
   }
 
-  // === M2: 自动分段 ===
-  /**
- * 自动分段：优先按自然段，最多7段
- * @param {string} text - 原文（可能含 \n\n）
- * @returns {string[]} 分段数组
- */
-function autoSegment(text) {
-  if (!text || typeof text !== 'string') return [];
-
-  // 第一步：按自然段分割（\n\n 或 \n）
-  let paragraphs = text.split(/\n\s*\n/).filter(p => p.trim() !== '');
-  
-  // 如果没有自然段（如一整段），则按句号切分
-  if (paragraphs.length === 1 && paragraphs[0].length === text.trim().length) {
-    const sentences = text.split(/([。；！？])/).filter(s => s.trim() !== '');
-    const fullSentences = [];
-    for (let i = 0; i < sentences.length; i++) {
-      if (/[。；！？]/.test(sentences[i]) && fullSentences.length > 0) {
-        fullSentences[fullSentences.length - 1] += sentences[i];
-      } else {
-        fullSentences.push(sentences[i]);
-      }
-    }
-    
-    // 合并短句成段（每段 ≤80字）
-    paragraphs = [];
-    let current = '';
-    for (const sent of fullSentences) {
-      if ((current + sent).length <= 80) {
-        current += sent;
-      } else {
-        if (current) paragraphs.push(current);
-        current = sent;
-      }
-    }
-    if (current) paragraphs.push(current);
+  function autoSegment(text) {
+    if (!text || typeof text !== 'string') return [];
+    return text
+      .split(/\n\s*\n/)
+      .map(p => p.trim())
+      .filter(p => p !== '');
   }
 
-  // 最多返回7段
-  return paragraphs.slice(0, 7);
-}
-
-  // === 初始化事件监听 ===
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('poemSelect').addEventListener('change', updatePreview);
-    document.getElementById('manualInput').addEventListener('input', updatePreview);
-    document.getElementById('confirmBtn').addEventListener('click', confirmYuanwen);
-  });
+  document.getElementById('poemSelect').addEventListener('change', updatePreview);
+  document.getElementById('manualInput').addEventListener('input', updatePreview);
+  document.getElementById('confirmBtn').addEventListener('click', confirmYuanwen);
 </script>
  
 </body>
