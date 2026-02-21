@@ -111,10 +111,80 @@
 
   // === M1: 原文确认 ===
   function updatePreview() { ... }
-  function confirmYuanwen() { ... }
+ function confirmYuanwen() {
+  const selectVal = document.getElementById('poemSelect').value;
+  const manualVal = document.getElementById('manualInput').value.trim();
+  const finalText = manualVal || selectVal;
+
+  if (!finalText) {
+    alert("请先选择或输入古文！");
+    return;
+  }
+
+  window.yuanwen = finalText;
+  const segments = autoSegment(window.yuanwen);
+  
+  // 打印详细信息
+  console.log("原文总字数:", finalText.length);
+  console.log("分段结果（共" + segments.length + "段）:", segments);
+  
+  alert(`✅ 原文已确认！\n总字数：${finalText.length}\n分为：${segments.length} 段\n\n请按 F12 查看详细分段。`);
+}
 
   // === M2: 自动分段 ===
-  function autoSegment(text) { ... }
+  /**
+ * 智能分段：保证全文完整，最多7段
+ * @param {string} text
+ * @returns {string[]}
+ */
+function autoSegment(text) {
+  if (!text || typeof text !== 'string') return [];
+
+  // 移除多余空白
+  text = text.trim();
+
+  // 按句末标点分割（保留标点）
+  const parts = text.split(/([。；！？])/).filter(p => p.trim() !== '');
+  
+  // 合并标点到前一句
+  const sentences = [];
+  for (let i = 0; i < parts.length; i++) {
+    if (/[。；！？]/.test(parts[i]) && sentences.length > 0) {
+      sentences[sentences.length - 1] += parts[i];
+    } else {
+      sentences.push(parts[i]);
+    }
+  }
+
+  const totalChars = text.length;
+  const maxSegments = 7;
+  const idealMaxLength = Math.ceil(totalChars / maxSegments); // 动态计算每段理想长度
+  const maxLength = Math.max(idealMaxLength, 50); // 至少50字，避免太碎
+
+  const segments = [];
+  let current = '';
+
+  for (const sent of sentences) {
+    if ((current + sent).length <= maxLength) {
+      current += sent;
+    } else {
+      if (current) segments.push(current);
+      // 如果单句超长，也允许突破 maxLength（避免在句中硬切）
+      current = sent;
+    }
+    
+    // 防止无限增长（极端情况）
+    if (segments.length >= maxSegments - 1) {
+      // 把剩余所有句子合并为最后一段
+      const remaining = [current, ...sentences.slice(sentences.indexOf(sent) + 1)].join('');
+      segments.push(remaining);
+      return segments.slice(0, maxSegments);
+    }
+  }
+
+  if (current) segments.push(current);
+  return segments.slice(0, maxSegments);
+}
 
   // === 初始化事件监听 ===
   document.addEventListener('DOMContentLoaded', () => {
