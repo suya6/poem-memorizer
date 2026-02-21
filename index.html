@@ -1,3 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>古诗背诵</title>
+</head>
+<body style="font-family: sans-serif; padding: 20px; background: #f0f0f0;">
+  <h2>🎉 恭喜！你的网页已成功创建！</h2>
+  <p>这是你的第一个古诗背诵助手页面。</p>
+  <button onclick="alert('语音功能即将上线！')">🎤 测试按钮</button>
+</body>
+</html>
 <!-- M1: 确认原文模块 -->
 <div class="card">
   <h3>📚 选择或粘贴要背诵的古文</h3>
@@ -5,47 +18,80 @@
   <!-- 下拉选择预置篇目 -->
   <label>选择篇目：</label>
   <select id="poemSelect" style="width:100%; padding:8px; margin:8px 0; border-radius:6px;">
-    <option value="">-- 请选择或手动粘贴 --</option>
+    <option value="">-- 请选择 --</option>
     <option value="晋太元中，武陵人捕鱼为业，缘溪行，忘路之远近。忽逢桃花林，夹岸数百步，中无杂树，芳草鲜美，落英缤纷。渔人甚异之，复前行，欲穷其林。">《桃花源记》（节选）</option>
-    <option value="庆历四年春，滕子京谪守巴陵郡。越明年，政通人和，百废具兴...">《岳阳楼记》（节选）</option>
-    <option value="予独爱莲之出淤泥而不染，濯清涟而不妖...">《爱莲说》</option>
+    <option value="庆历四年春，滕子京谪守巴陵郡。越明年，政通人和，百废具兴，乃重修岳阳楼...">《岳阳楼记》（节选）</option>
+    <option value="予独爱莲之出淤泥而不染，濯清涟而不妖，中通外直，不蔓不枝...">《爱莲说》</option>
     <!-- 可继续添加更多 -->
   </select>
 
   <!-- 手动粘贴 -->
   <label>或粘贴原文：</label>
-  <textarea id="manualInput" placeholder="在此粘贴全文..." rows="4" style="width:100%; padding:10px; border-radius:6px;"></textarea>
+  <textarea id="manualInput" placeholder="在此粘贴全文..." rows="4" style="width:100%; padding:10px; border-radius:6px; margin:8px 0;"></textarea>
 
-  <button onclick="confirmYuanwen()">✅ 确认原文</button>
+  <!-- 原文预览区 -->
+  <div id="previewArea" style="background:#f8f9fa; padding:12px; border-radius:8px; margin:15px 0; min-height:60px; display:none;">
+    <strong>预览原文：</strong>
+    <div id="previewText" style="margin-top:8px; white-space:pre-wrap; line-height:1.6;"></div>
+  </div>
+
+  <!-- 确认按钮（初始禁用） -->
+  <button id="confirmBtn" onclick="confirmYuanwen()" disabled style="background:#ccc;">✅ 确认原文</button>
 </div>
 
 <script>
-// 全局变量：存储最终确认的原文
+// 全局变量
 window.yuanwen = "";
+
+// 监听下拉框和文本域变化
+document.getElementById('poemSelect').addEventListener('change', updatePreview);
+document.getElementById('manualInput').addEventListener('input', updatePreview);
+
+function updatePreview() {
+  const selectVal = document.getElementById('poemSelect').value;
+  const manualVal = document.getElementById('manualInput').value.trim();
+  const previewArea = document.getElementById('previewArea');
+  const previewText = document.getElementById('previewText');
+  const confirmBtn = document.getElementById('confirmBtn');
+
+  let textToShow = '';
+
+  // 优先显示手动输入内容（如果有的话）
+  if (manualVal) {
+    textToShow = manualVal;
+  } else if (selectVal) {
+    textToShow = selectVal;
+  }
+
+  if (textToShow) {
+    previewText.textContent = textToShow;
+    previewArea.style.display = 'block';
+    confirmBtn.disabled = false;
+    confirmBtn.style.background = '#3498db';
+  } else {
+    previewArea.style.display = 'none';
+    confirmBtn.disabled = true;
+    confirmBtn.style.background = '#ccc';
+  }
+}
 
 function confirmYuanwen() {
   const selectVal = document.getElementById('poemSelect').value;
   const manualVal = document.getElementById('manualInput').value.trim();
 
-  let finalText = "";
+  // 再次获取最终文本（防止用户改了没触发 preview）
+  let finalText = manualVal || selectVal;
 
-  if (manualVal) {
-    // 优先使用手动粘贴内容
-    finalText = manualVal;
-  } else if (selectVal) {
-    // 使用下拉选择内容
-    finalText = selectVal;
-  } else {
-    alert("请先选择一篇古文或粘贴原文！");
+  if (!finalText) {
+    alert("请先选择或输入古文！");
     return;
   }
 
-  // 存入全局变量
   window.yuanwen = finalText;
 
-  // 可选：显示确认信息
-  alert("原文已确认！共 " + finalText.length + " 字。\n\n开始分段背诵吧～");
+  // 可选：高亮提示已确认
+  alert("✅ 原文已确认！共 " + finalText.length + " 字。\n\n接下来将进入分段背诵流程。");
 
-  // TODO: 这里后续可调用分段函数 autoSegment(window.yuanwen)
+  // TODO: 这里后续可调用 autoSegment(window.yuanwen)
 }
 </script>
