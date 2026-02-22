@@ -238,12 +238,12 @@
         .filter(p => p !== '');
     }
 
-    // === M3: 占位资源（使用 picsum.photos）===
+    // === M3: 占位资源（使用 picsum.photos + fallback）===
     function generatePlaceholderM3Data(segments) {
       return segments.map((_, index) => {
         const i = index + 1;
         return {
-          image: `https://picsum.photos/id/${i % 600 + 1}/400/200`,
+          image: `https://picsum.photos/400/200?random=${i}`, // ✅ 更稳定的随机图
           translation: `宝子！第${i}段来啦～你就说：“这里放超有梗的现代翻译...” 💬`,
           keyPoints: `💡考点速记：\n• 字词：解释（开发占位，第${i}段）\n• 句式：待填充`
         };
@@ -285,8 +285,6 @@
       console.log("✅ 分段数量:", segments.length);
       console.log("✅ M3 数据:", window.m3Data);
       console.log("✅ 创作背景:", window.poemMeta);
-
-      alert(`✅ ${title} 已加载！\n共 ${segments.length} 段\n创作背景已显示～`);
     }
 
     // === M4: 背诵界面（彻底隐藏前置内容）===
@@ -321,9 +319,12 @@
       document.getElementById('currentIdx').textContent = idx + 1;
       document.getElementById('totalSegs').textContent = total;
 
-      // 填充内容
-      document.getElementById('imageContainer').innerHTML = 
-        `<img src="${data.image}" style="width:100%; max-width:400px; height:auto; border-radius:8px;">`;
+      // 填充内容（带错误处理）
+      document.getElementById('imageContainer').innerHTML = `
+        <img src="${data.image}" 
+             style="width:100%; max-width:400px; height:auto; border-radius:8px;" 
+             onerror="this.parentElement.innerHTML='<p style=\"color:#e74c3c;\">⚠️ 图片加载失败（网络问题）</p>';">
+      `;
       document.getElementById('translationContainer').innerHTML = 
         `<p style="font-size:16px; color:#e74c3c;">${data.translation}</p>`;
       document.getElementById('keyPointsContainer').innerHTML = 
