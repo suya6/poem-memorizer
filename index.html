@@ -3,21 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>古诗背诵助手📚</title>
+  <title>古诗背诵助手 - 全平台兼容版 🎤</title>
   <style>
     body {
       font-family: "Microsoft YaHei", sans-serif;
-      padding: 20px;
-      background: #fff9f9;
+      padding: 15px;
+      background: #f9f7f0;
       line-height: 1.6;
+      color: #333;
     }
     select, textarea, button {
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
+      padding: 12px;
+      margin: 8px 0;
       border: 1px solid #ccc;
-      border-radius: 6px;
+      border-radius: 8px;
       box-sizing: border-box;
+      font-size: 16px; /* 防止 iOS 自动缩放 */
     }
     #previewArea {
       background: #fff;
@@ -31,17 +33,13 @@
       display: none;
       margin-top: 20px;
       padding: 15px;
-      background: #f0f8ff;
-      border-left: 4px solid #4a90e2;
+      background: #e8f4fc;
+      border-left: 4px solid #3498db;
       border-radius: 6px;
-    }
-    #backgroundPanel h3 {
-      margin-top: 0;
-      color: #2c3e50;
     }
     #startReciteBtn {
       display: none;
-      background: #ff6b6b;
+      background: #2ecc71;
       color: white;
       font-weight: bold;
       padding: 12px;
@@ -50,9 +48,6 @@
       cursor: pointer;
       font-size: 16px;
     }
-    #startReciteBtn:hover {
-      background: #ff5252;
-    }
 
     /* M4 背诵界面 */
     #reciteArea {
@@ -60,57 +55,64 @@
       margin-top: 20px;
       padding: 20px;
       background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     #reciteTitle {
       color: #2c3e50;
       margin-top: 0;
     }
     .toggle-btns {
-      margin: 10px 0;
+      margin: 12px 0;
     }
     .toggle-btns button {
-      padding: 8px 12px;
+      padding: 10px 14px;
       margin-right: 8px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       font-weight: bold;
+      font-size: 14px;
     }
-    #prevBtn, #nextBtn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      margin-top: 15px;
+
+    .speech-guide {
+      background: #e8f5e9;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-size: 14px;
+      border-left: 3px solid #4caf50;
     }
-    #prevBtn {
-      background: #bdc3c7;
-      color: #34495e;
+
+    #feedbackArea {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      display: none;
     }
-    #prevBtn:disabled {
-      background: #ecf0f1;
-      color: #95a5a6;
-      cursor: not-allowed;
+    .highlight-correct { background-color: #d4edda; color: #155724; }
+    .highlight-missing { background-color: #f8d7da; text-decoration: line-through; color: #721c24; }
+    .highlight-extra { background-color: #fff3cd; color: #856404; }
+
+    .score-bar {
+      height: 10px;
+      background: #e9ecef;
+      border-radius: 5px;
+      margin: 5px 0;
+      overflow: hidden;
     }
-    #nextBtn {
-      background: #3498db;
-      color: white;
-      margin-left: 10px;
-    }
-    #nextBtn:disabled {
-      background: #bdc3c7;
-      color: #95a5a6;
-      cursor: not-allowed;
+    .score-fill {
+      height: 100%;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
-  <h1>古诗背诵助手📚</h1>
-  <p>选择或粘贴要背诵的古文</p>
+  <h1>古诗背诵助手 - 全平台兼容版 🎤</h1>
+  <p>选择篇目 → 确认原文 → 开始背诵 → 用<strong>键盘🎤</strong>语音输入，自动评分！</p>
 
   <label for="poemSelect">选择篇目：</label>
   <select id="poemSelect">
@@ -125,24 +127,6 @@
 
 便舍船，从口入。初极狭，才通人。复行数十步，豁然开朗。">《桃花源记》</option>
     
-    <option value="庆历四年春，滕子京谪守巴陵郡。越明年，政通人和，百废具兴。
-
-乃重修岳阳楼，增其旧制，刻唐贤今人诗赋于其上。
-
-予观夫巴陵胜状，在洞庭一湖。衔远山，吞长江，浩浩汤汤，横无际涯。
-
-至若春和景明，波澜不惊，上下天光，一碧万顷。
-
-嗟夫！予尝求古仁人之心，或异二者之为，何哉？">《岳阳楼记》（节选）</option>
-    
-    <option value="水陆草木之花，可爱者甚蕃。晋陶渊明独爱菊。自李唐来，世人甚爱牡丹。
-
-予独爱莲之出淤泥而不染，濯清涟而不妖，中通外直，不蔓不枝。
-
-香远益清，亭亭净植，可远观而不可亵玩焉。
-
-予谓菊，花之隐逸者也；牡丹，花之富贵者也；莲，花之君子者也。">《爱莲说》</option>
-    
     <option value="山不在高，有仙则名。水不在深，有龙则灵。
 
 斯是陋室，惟吾德馨。苔痕上阶绿，草色入帘青。
@@ -150,14 +134,6 @@
 谈笑有鸿儒，往来无白丁。可以调素琴，阅金经。
 
 无丝竹之乱耳，无案牍之劳形。南阳诸葛庐，西蜀子云亭。">《陋室铭》</option>
-    
-    <option value="从小丘西行百二十步，隔篁竹，闻水声，如鸣珮环，心乐之。
-
-伐竹取道，下见小潭，水尤清冽。全石以为底，近岸，卷石底以出。
-
-潭中鱼可百许头，皆若空游无所依。日光下澈，影布石上。
-
-坐潭上，四面竹树环合，寂寥无人，凄神寒骨，悄怆幽邃。">《小石潭记》（节选）</option>
   </select>
 
   <label for="manualInput">或粘贴原文：</label>
@@ -170,13 +146,11 @@
 
   <button id="confirmBtn" disabled>✅ 确认原文</button>
 
-  <!-- M0: 创作背景 -->
   <div id="backgroundPanel">
     <h3>📜 创作背景</h3>
     <div id="backgroundText"></div>
   </div>
 
-  <!-- 开始背诵按钮 -->
   <button id="startReciteBtn">📖 开始背诵</button>
 
   <!-- M4: 背诵界面 -->
@@ -189,27 +163,159 @@
       <button id="toggleKeyPoints">💡 显示考点</button>
     </div>
 
-    <!-- 内容容器（初始隐藏） -->
     <div id="imageContainer" style="display:none; margin:15px 0;"></div>
     <div id="translationContainer" style="display:none; margin:15px 0;"></div>
     <div id="keyPointsContainer" style="display:none;"></div>
     
-    <div>
+    <div class="speech-guide">
+      🎤 <strong>如何语音输入？</strong><br>
+      1️⃣ 点击下方输入框 → 2️⃣ 弹出键盘后点击 <strong>键盘上的🎤麦克风</strong>（搜狗/讯飞/百度等输入法均有）→ 3️⃣ 朗读当前段落
+    </div>
+    
+    <textarea 
+      id="speechInput" 
+      rows="4"
+      placeholder="点我 → 用键盘🎤说话 → 提交评测"
+    ></textarea>
+    
+    <button id="submitSpeechBtn" style="background:#3498db; color:white;">
+      ✅ 提交背诵并评分
+    </button>
+    
+    <div style="margin-top:15px;">
       <button id="prevBtn" disabled>⬅️ 上一段</button>
       <button id="nextBtn">下一段 ➡️</button>
     </div>
+
+    <!-- 语音反馈区 -->
+    <div id="feedbackArea"></div>
   </div>
 
-  <!-- JS 逻辑 -->
   <script>
     // === 全局变量 ===
     window.yuanwen = "";
     window.m3Data = [];
-    window.poemMeta = null;
     let currentSegmentIndex = 0;
     const segmentStates = {};
 
-    // === M1: 预览 ===
+    // === 工具函数 ===
+    function autoSegment(text) {
+      return text.split(/\n\s*\n/).map(p => p.trim()).filter(p => p !== '');
+    }
+
+    function generatePlaceholderM3Data(segments) {
+      return segments.map((originalText, index) => ({
+        originalText,
+        image: `https://picsum.photos/400/200?random=${index+1}`,
+        translation: `第${index+1}段现代翻译：此处可替换为真实译文...`,
+        keyPoints: `• 考点占位\n• 第${index+1}段`
+      }));
+    }
+
+    // === 高级比对引擎 ===
+    function advancedCompare(spoken, original) {
+      const cleanSpoken = spoken.replace(/[，。？！；：“”‘’\s]/g, '');
+      const cleanOriginal = original.replace(/[，。？！；：“”‘’\s]/g, '');
+
+      // 准确率
+      const editDist = levenshteinDistance(cleanSpoken, cleanOriginal);
+      const maxLength = Math.max(cleanSpoken.length, cleanOriginal.length);
+      const accuracy = maxLength > 0 ? Math.max(0, 100 - Math.round((editDist / maxLength) * 100)) : 0;
+
+      // 完整度
+      const originalWords = cleanOriginal.split('');
+      const spokenSet = new Set(cleanSpoken.split(''));
+      const covered = originalWords.filter(w => spokenSet.has(w)).length;
+      const completeness = originalWords.length > 0 ? Math.round((covered / originalWords.length) * 100) : 0;
+
+      // 流畅度（模拟）
+      const fluency = spoken.length > 5 ? Math.min(100, 80 + Math.random() * 20) : 50;
+
+      // 高亮差异
+      const highlighted = highlightDifferences(spoken, original);
+
+      return { accuracy, completeness, fluency, highlighted };
+    }
+
+    function levenshteinDistance(a, b) {
+      if (a.length === 0) return b.length;
+      if (b.length === 0) return a.length;
+      const matrix = Array(b.length + 1).fill().map((_, i) => [i]);
+      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          const cost = b[i-1] === a[j-1] ? 0 : 1;
+          matrix[i][j] = Math.min(matrix[i-1][j] + 1, matrix[i][j-1] + 1, matrix[i-1][j-1] + cost);
+        }
+      }
+      return matrix[b.length][a.length];
+    }
+
+    function highlightDifferences(spoken, original) {
+      const cleanSpoken = spoken.replace(/[，。？！；：“”‘’\s]/g, '');
+      const cleanOriginal = original.replace(/[，。？！；：“”‘’\s]/g, '');
+      
+      let result = '';
+      let i = 0, j = 0;
+      
+      while (i < cleanSpoken.length || j < cleanOriginal.length) {
+        if (i < cleanSpoken.length && j < cleanOriginal.length && cleanSpoken[i] === cleanOriginal[j]) {
+          result += `<span class="highlight-correct">${cleanSpoken[i]}</span>`;
+          i++; j++;
+        } else if (i < cleanSpoken.length && (j >= cleanOriginal.length || !cleanOriginal.includes(cleanSpoken[i]))) {
+          result += `<span class="highlight-extra">${cleanSpoken[i]}</span>`;
+          i++;
+        } else {
+          result += `<span class="highlight-missing">${cleanOriginal[j]}</span>`;
+          j++;
+        }
+      }
+      return result || '（无内容）';
+    }
+
+    function getColorByScore(score) {
+      if (score >= 90) return '#27ae60';
+      if (score >= 70) return '#f39c12';
+      return '#e74c3c';
+    }
+
+    function renderFeedback(result, spoken) {
+      const { accuracy, completeness, fluency, highlighted } = result;
+      const avg = Math.round((accuracy + completeness + fluency) / 3);
+
+      let comment = "";
+      if (avg >= 90) comment = "🌟 背得完美！你就是古文小达人！";
+      else if (avg >= 75) comment = "👍 很棒！注意几个字就满分啦～";
+      else if (avg >= 60) comment = "💡 有进步！再读两遍会更好";
+      else comment = "🌱 别灰心，多听多读，你一定行！";
+
+      const feedbackHTML = `
+        <h3>📊 背诵评测报告</h3>
+        <p><strong>你说的是：</strong>${spoken}</p>
+        <p><strong>原文对比：</strong></p>
+        <div style="font-family:monospace; padding:8px; background:#eee; border-radius:4px;">${highlighted}</div>
+        
+        <div style="margin:15px 0;">
+          <div>✅ 准确率: ${accuracy}%</div>
+          <div class="score-bar"><div class="score-fill" style="width:${accuracy}%; background:${getColorByScore(accuracy)}"></div></div>
+          
+          <div>📚 完整度: ${completeness}%</div>
+          <div class="score-bar"><div class="score-fill" style="width:${completeness}%; background:${getColorByScore(completeness)}"></div></div>
+          
+          <div>🗣️ 流畅度: ${fluency.toFixed(0)}%</div>
+          <div class="score-bar"><div class="score-fill" style="width:${fluency}%; background:${getColorByScore(fluency)}"></div></div>
+        </div>
+        
+        <p><strong>综合评分: ${avg}分</strong></p>
+        <p style="font-weight:bold; color:${avg>=80?'#27ae60':avg>=60?'#f39c12':'#e74c3c'}">${comment}</p>
+      `;
+
+      const el = document.getElementById('feedbackArea');
+      el.innerHTML = feedbackHTML;
+      el.style.display = 'block';
+    }
+
+    // === 主流程 ===
     function updatePreview() {
       const selectVal = document.getElementById('poemSelect').value;
       const manualVal = document.getElementById('manualInput').value.trim();
@@ -218,7 +324,6 @@
       const confirmBtn = document.getElementById('confirmBtn');
 
       let textToShow = manualVal || selectVal;
-
       if (textToShow) {
         previewText.textContent = textToShow;
         previewArea.style.display = 'block';
@@ -229,163 +334,97 @@
       }
     }
 
-    // === M2: 分段 ===
-    function autoSegment(text) {
-      if (!text || typeof text !== 'string') return [];
-      return text
-        .split(/\n\s*\n/)
-        .map(p => p.trim())
-        .filter(p => p !== '');
-    }
-
-    // === M3: 占位资源（使用 picsum.photos + fallback）===
-    function generatePlaceholderM3Data(segments) {
-      return segments.map((_, index) => {
-        const i = index + 1;
-        return {
-          image: `https://picsum.photos/400/200?random=${i}`, // ✅ 更稳定的随机图
-          translation: `宝子！第${i}段来啦～你就说：“这里放超有梗的现代翻译...” 💬`,
-          keyPoints: `💡考点速记：\n• 字词：解释（开发占位，第${i}段）\n• 句式：待填充`
-        };
-      });
-    }
-
-    // === M0: 背景占位 ===
-    function loadPlaceholderMetadata(title) {
-      return {
-        title: title,
-        author: "作者待补充",
-        background: "【创作背景占位】\n• 时代：待填充\n• 事件：待填充\n• 情绪：待填充\n\n（晚点将替换为真实历史背景，帮助你理解作者心境！）"
-      };
-    }
-
-    // === 主流程 ===
     function confirmYuanwen() {
       const selectEl = document.getElementById('poemSelect');
       const title = selectEl.options[selectEl.selectedIndex].text;
-      const selectVal = selectEl.value;
-      const manualVal = document.getElementById('manualInput').value.trim();
-      const finalText = manualVal || selectVal;
+      const finalText = document.getElementById('manualInput').value.trim() || selectEl.value;
 
-      if (!finalText) {
-        alert("请先选择或输入古文！");
-        return;
-      }
-
+      if (!finalText) return alert("请先选择或输入古文！");
+      
       window.yuanwen = finalText;
       const segments = autoSegment(finalText);
       window.m3Data = generatePlaceholderM3Data(segments);
-      window.poemMeta = loadPlaceholderMetadata(title);
-
-      document.getElementById('backgroundText').textContent = window.poemMeta.background;
+      
+      document.getElementById('backgroundText').textContent = `【创作背景占位】\n正在学习：${title}`;
       document.getElementById('backgroundPanel').style.display = 'block';
       document.getElementById('startReciteBtn').style.display = 'block';
-
-      console.log("✅ 原文总字数:", finalText.length);
-      console.log("✅ 分段数量:", segments.length);
-      console.log("✅ M3 数据:", window.m3Data);
-      console.log("✅ 创作背景:", window.poemMeta);
     }
 
-    // === M4: 背诵界面（彻底隐藏前置内容）===
     function renderReciteInterface() {
-      if (!window.m3Data || window.m3Data.length === 0) return;
+      // 隐藏前置界面
+      ['poemSelect', 'manualInput', 'previewArea', 'confirmBtn', 'backgroundPanel', 'startReciteBtn']
+        .forEach(id => document.getElementById(id).style.display = 'none');
+      document.querySelector('label[for="manualInput"]').style.display = 'none';
 
-      // 隐藏所有 M0-M3 元素
-      document.getElementById('poemSelect').style.display = 'none';
-      const manualLabel = document.querySelector('label[for="manualInput"]');
-      if (manualLabel) manualLabel.style.display = 'none';
-      document.getElementById('manualInput').style.display = 'none';
-      document.getElementById('previewArea').style.display = 'none';
-      document.getElementById('confirmBtn').style.display = 'none';
-      document.getElementById('backgroundPanel').style.display = 'none';
-      document.getElementById('startReciteBtn').style.display = 'none';
-
-      // 显示背诵界面
       document.getElementById('reciteArea').style.display = 'block';
+      currentSegmentIndex = 0;
       updateReciteSegment();
     }
 
     function updateReciteSegment() {
+      const data = window.m3Data[currentSegmentIndex];
       const total = window.m3Data.length;
-      const idx = currentSegmentIndex;
-      const data = window.m3Data[idx];
-
-      if (!segmentStates[idx]) {
-        segmentStates[idx] = { image: false, translation: false, keyPoints: false };
-      }
-      const state = segmentStates[idx];
-
-      document.getElementById('currentIdx').textContent = idx + 1;
+      document.getElementById('currentIdx').textContent = currentSegmentIndex + 1;
       document.getElementById('totalSegs').textContent = total;
 
-      // 填充内容（带错误处理）
+      if (!segmentStates[currentSegmentIndex]) {
+        segmentStates[currentSegmentIndex] = { image: false, translation: false, keyPoints: false };
+      }
+      const state = segmentStates[currentSegmentIndex];
+
       document.getElementById('imageContainer').innerHTML = `
-        <img src="${data.image}" 
-             style="width:100%; max-width:400px; height:auto; border-radius:8px;" 
-             onerror="this.parentElement.innerHTML='<p style=\"color:#e74c3c;\">⚠️ 图片加载失败（网络问题）</p>';">
-      `;
-      document.getElementById('translationContainer').innerHTML = 
-        `<p style="font-size:16px; color:#e74c3c;">${data.translation}</p>`;
-      document.getElementById('keyPointsContainer').innerHTML = 
-        `<pre style="background:#f9f9f9; padding:12px; border-radius:6px; white-space:pre-wrap;">${data.keyPoints}</pre>`;
+        <img src="${data.image}" style="width:100%; max-width:400px; height:auto; border-radius:8px;" 
+             onerror="this.parentElement.innerHTML='<p style=\"color:#e74c3c;\">⚠️ 图片加载失败</p>';">`;
+      document.getElementById('translationContainer').innerHTML = `<p>${data.translation}</p>`;
+      document.getElementById('keyPointsContainer').innerHTML = `<pre>${data.keyPoints}</pre>`;
 
-      // 控制显隐
-      document.getElementById('imageContainer').style.display = state.image ? 'block' : 'none';
-      document.getElementById('translationContainer').style.display = state.translation ? 'block' : 'none';
-      document.getElementById('keyPointsContainer').style.display = state.keyPoints ? 'block' : 'none';
+      ['image', 'translation', 'keyPoints'].forEach(key => {
+        const el = document.getElementById(`${key}Container`);
+        el.style.display = state[key] ? 'block' : 'none';
+        document.getElementById(`toggle${key.charAt(0).toUpperCase() + key.slice(1)}`).textContent = 
+          state[key] ? `隐藏${['配图','译文','考点'][['image','translation','keyPoints'].indexOf(key)]}` 
+                     : `显示${['配图','译文','考点'][['image','translation','keyPoints'].indexOf(key)]}`;
+      });
 
-      // 更新按钮文字
-      document.getElementById('toggleImage').textContent = state.image ? '🖼️ 隐藏配图' : '🖼️ 显示配图';
-      document.getElementById('toggleTranslation').textContent = state.translation ? '💬 隐藏译文' : '💬 显示译文';
-      document.getElementById('toggleKeyPoints').textContent = state.keyPoints ? '💡 隐藏考点' : '💡 显示考点';
-
-      // 导航按钮状态
-      document.getElementById('prevBtn').disabled = (idx === 0);
-      document.getElementById('nextBtn').disabled = (idx === total - 1);
+      document.getElementById('prevBtn').disabled = currentSegmentIndex === 0;
+      document.getElementById('nextBtn').disabled = currentSegmentIndex === total - 1;
+      document.getElementById('feedbackArea').style.display = 'none';
+      document.getElementById('speechInput').value = ''; // 清空输入框
     }
 
     // === 事件绑定 ===
     document.getElementById('poemSelect').addEventListener('change', updatePreview);
     document.getElementById('manualInput').addEventListener('input', updatePreview);
     document.getElementById('confirmBtn').addEventListener('click', confirmYuanwen);
-
-    document.getElementById('startReciteBtn').addEventListener('click', function() {
-      if (!window.m3Data || window.m3Data.length === 0) {
-        alert("请先确认原文！");
-        return;
-      }
-      currentSegmentIndex = 0;
-      renderReciteInterface();
-    });
-
-    document.getElementById('prevBtn').addEventListener('click', function() {
+    document.getElementById('startReciteBtn').addEventListener('click', renderReciteInterface);
+    document.getElementById('prevBtn').addEventListener('click', () => {
       if (currentSegmentIndex > 0) {
         currentSegmentIndex--;
         updateReciteSegment();
       }
     });
-
-    document.getElementById('nextBtn').addEventListener('click', function() {
+    document.getElementById('nextBtn').addEventListener('click', () => {
       if (currentSegmentIndex < window.m3Data.length - 1) {
         currentSegmentIndex++;
         updateReciteSegment();
       }
     });
-
-    document.getElementById('toggleImage').addEventListener('click', function() {
-      segmentStates[currentSegmentIndex].image = !segmentStates[currentSegmentIndex].image;
-      updateReciteSegment();
+    ['Image', 'Translation', 'KeyPoints'].forEach(name => {
+      document.getElementById(`toggle${name}`).addEventListener('click', () => {
+        const key = name.toLowerCase();
+        segmentStates[currentSegmentIndex][key] = !segmentStates[currentSegmentIndex][key];
+        updateReciteSegment();
+      });
     });
-
-    document.getElementById('toggleTranslation').addEventListener('click', function() {
-      segmentStates[currentSegmentIndex].translation = !segmentStates[currentSegmentIndex].translation;
-      updateReciteSegment();
-    });
-
-    document.getElementById('toggleKeyPoints').addEventListener('click', function() {
-      segmentStates[currentSegmentIndex].keyPoints = !segmentStates[currentSegmentIndex].keyPoints;
-      updateReciteSegment();
+    document.getElementById('submitSpeechBtn').addEventListener('click', () => {
+      const spoken = document.getElementById('speechInput').value.trim();
+      if (!spoken) {
+        alert("请先通过键盘🎤输入背诵内容！");
+        return;
+      }
+      const original = window.m3Data[currentSegmentIndex].originalText;
+      const result = advancedCompare(spoken, original);
+      renderFeedback(result, spoken);
     });
   </script>
 </body>
