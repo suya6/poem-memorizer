@@ -83,7 +83,6 @@
       font-size: 1.2em;
     }
 
-    /* ✅ 修复：带状态反馈的单选圆点 */
     .options-row {
       display: flex;
       gap: 16px;
@@ -172,7 +171,7 @@
 
 林尽水源，便得一山，山有小口，仿佛若有光。
 
-便舍船，从口入。初极狭，才通人。复行数十步，豁然开朗。">《桃花源记》节选</option>
+便舍船，从口入。初极狭，才通人。复行数十步，豁然开朗。" data-poem-id="taohuayuan">《桃花源记》节选</option>
     
     <option value="山不在高，有仙则名。水不在深，有龙则灵。
 
@@ -180,7 +179,7 @@
 
 谈笑有鸿儒，往来无白丁。可以调素琴，阅金经。
 
-无丝竹之乱耳，无案牍之劳形。南阳诸葛庐，西蜀子云亭。">《陋室铭》</option>
+无丝竹之乱耳，无案牍之劳形。南阳诸葛庐，西蜀子云亭。" data-poem-id="loushi">《陋室铭》</option>
   </select>
 
   <label for="manualInput">✏️ 或粘贴原文：</label>
@@ -249,6 +248,7 @@
     window.yuanwen = "";
     window.m3Data = [];
     let currentSegmentIndex = 0;
+    let currentPoemId = ''; // ✅ 新增：记录当前篇目ID
     const segmentStates = {};
 
     // === 工具函数 ===
@@ -256,30 +256,42 @@
       return text.split(/\n\s*\n/).map(p => p.trim()).filter(p => p !== '');
     }
 
-    // ✅ 更新：中小学生友好译文 + 标准化考点
-    function generatePlaceholderM3Data(segments) {
+    // ✅ 修复：按篇目ID返回专属译文和考点
+    function generatePlaceholderM3Data(segments, poemId = 'custom') {
+      const poemData = {
+        taohuayuan: {
+          translations: [
+            "渔人小哥划船迷路，突然闯进一片绝美桃花林！粉红花瓣飘满地～🌸",
+            "穿过山洞，眼前竟是一个与世隔绝的乌托邦！没有作业，没有考试，只有快乐村民～😎"
+          ],
+          keyPoints: [
+            `【字词】缘：沿着、顺着\n【字词】鲜美：鲜艳美丽（不是好吃！）\n【字词】落英：落花\n【文化】“芳草鲜美，落英缤纷”：经典景物描写，常考赏析`,
+            `【字词】妻子：妻子和孩子\n【字词】绝境：与世隔绝的地方\n【句式】“不足为外人道也”：省略句，(桃花源人) 不值得对外人说\n【文化】“世外桃源”成语出处`
+          ]
+        },
+        loushi: {
+          translations: [
+            "山不用高，有仙就灵；房不用豪，有德就香～陋室也能变网红打卡地！🏠💫",
+            "谈笑全是学霸，来往没有学渣！弹琴读书，远离内卷，这才是理想生活啊～📚🧘"
+          ],
+          keyPoints: [
+            `【句式】“……者，……也”：判断句，如“斯是陋室”=“这是一间陋室”\n【虚词】“之”：取消句子独立性，无实义\n【文化】“南阳诸葛庐，西蜀子云亭”：用名人故居类比，抬高自己`,
+            `【字词】鸿儒：大学问家\n【字词】白丁：平民，没功名的人\n【句式】“可以……”：省略主语“吾”，我能……`
+          ]
+        }
+      };
+
+      const data = poemData[poemId] || {
+        translations: Array(segments.length).fill("暂无译文"),
+        keyPoints: Array(segments.length).fill("【字词】暂无考点")
+      };
+
       return segments.map((originalText, index) => {
-        const n = index + 1;
-
-        const translations = [
-          "渔人小哥划船迷路，突然闯进一片绝美桃花林！粉红花瓣飘满地～🌸",
-          "穿过山洞，眼前竟是一个与世隔绝的乌托邦！没有作业，没有考试，只有快乐村民～😎",
-          "山不用高，有仙就灵；房不用豪，有德就香～陋室也能变网红打卡地！🏠💫",
-          "谈笑全是学霸，来往没有学渣！弹琴读书，远离内卷，这才是理想生活啊～📚🧘"
-        ];
-
-        const keyPointsList = [
-          `【字词】缘：沿着、顺着\n【字词】鲜美：鲜艳美丽（不是好吃！）\n【字词】落英：落花\n【文化】“芳草鲜美，落英缤纷”：经典景物描写，常考赏析`,
-          `【字词】妻子：妻子和孩子\n【字词】绝境：与世隔绝的地方\n【句式】“不足为外人道也”：省略句，(桃花源人) 不值得对外人说\n【文化】“世外桃源”成语出处`,
-          `【句式】“……者，……也”：判断句，如“斯是陋室”=“这是一间陋室”\n【虚词】“之”：取消句子独立性，无实义\n【文化】“南阳诸葛庐，西蜀子云亭”：用名人故居类比，抬高自己`,
-          `【字词】鸿儒：大学问家\n【字词】白丁：平民，没功名的人\n【句式】“可以……”：省略主语“吾”，我能……`
-        ];
-
         return {
           originalText,
-          image: `https://picsum.photos/800/600?random=${n}`,
-          translation: translations[index] || `第${n}段超酷翻译正在加载中...🚀`,
-          keyPoints: keyPointsList[index] || `【字词】暂无考点\n【句式】敬请期待～`
+          image: `https://picsum.photos/800/600?random=${poemId}-${index}`,
+          translation: data.translations[index] || `第${index + 1}段译文缺失`,
+          keyPoints: data.keyPoints[index] || `【字词】第${index + 1}段无考点`
         };
       });
     }
@@ -407,14 +419,18 @@
 
     function confirmYuanwen() {
       const selectEl = document.getElementById('poemSelect');
-      const title = selectEl.options[selectEl.selectedIndex].text;
+      const selectedIndex = selectEl.selectedIndex;
+      const title = selectEl.options[selectedIndex].text;
       const finalText = document.getElementById('manualInput').value.trim() || selectEl.value;
 
       if (!finalText) return alert("请先选择或输入古文！");
       
+      // ✅ 获取 poem-id
+      currentPoemId = selectEl.options[selectedIndex].dataset.poemId || 'custom';
+      
       window.yuanwen = finalText;
       const segments = autoSegment(finalText);
-      window.m3Data = generatePlaceholderM3Data(segments);
+      window.m3Data = generatePlaceholderM3Data(segments, currentPoemId); // 传入 poemId
       
       document.getElementById('backgroundText').textContent = `【创作背景占位】\n正在学习：${title}`;
       document.getElementById('backgroundPanel').style.display = 'block';
@@ -445,7 +461,6 @@
         contentContainer.innerHTML = '';
       }
 
-      // 同步单选按钮状态
       document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
         radio.checked = (radio.value === viewMode);
       });
