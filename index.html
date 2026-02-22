@@ -190,7 +190,7 @@
     </div>
 
     <!-- 内容容器（初始隐藏） -->
-    <div id="imageContainer" style="display:none;"></div>
+    <div id="imageContainer" style="display:none; margin:15px 0;"></div>
     <div id="translationContainer" style="display:none; margin:15px 0;"></div>
     <div id="keyPointsContainer" style="display:none;"></div>
     
@@ -238,12 +238,13 @@
         .filter(p => p !== '');
     }
 
-    // === M3: 占位资源 ===
+    // === M3: 占位资源（使用 picsum.photos）===
     function generatePlaceholderM3Data(segments) {
       return segments.map((_, index) => {
         const i = index + 1;
         return {
-          image: `https://via.placeholder.com/400x200/FFD1DC/000000?text=配图-段${i}&font=noto`,
+          // ✅ 使用 picsum.photos，避免 via.placeholder.com 的 DNS 问题
+          image: `https://picsum.photos/id/${i % 600 + 1}/400/200`,
           translation: `宝子！第${i}段来啦～你就说：“这里放超有梗的现代翻译...” 💬`,
           keyPoints: `💡考点速记：\n• 字词：解释（开发占位，第${i}段）\n• 句式：待填充`
         };
@@ -289,15 +290,22 @@
       alert(`✅ ${title} 已加载！\n共 ${segments.length} 段\n创作背景已显示～`);
     }
 
-    // === M4: 背诵界面 ===
+    // === M4: 背诵界面（彻底隐藏前置内容）===
     function renderReciteInterface() {
       if (!window.m3Data || window.m3Data.length === 0) return;
-      
-      document.getElementById('reciteArea').style.display = 'block';
+
+      // ✅ 隐藏所有 M0-M3 元素
+      document.getElementById('poemSelect').style.display = 'none';
+      const manualLabel = document.querySelector('label[for="manualInput"]');
+      if (manualLabel) manualLabel.style.display = 'none';
+      document.getElementById('manualInput').style.display = 'none';
       document.getElementById('previewArea').style.display = 'none';
+      document.getElementById('confirmBtn').style.display = 'none';
       document.getElementById('backgroundPanel').style.display = 'none';
       document.getElementById('startReciteBtn').style.display = 'none';
-      
+
+      // 显示背诵界面
+      document.getElementById('reciteArea').style.display = 'block';
       updateReciteSegment();
     }
 
@@ -306,13 +314,11 @@
       const idx = currentSegmentIndex;
       const data = window.m3Data[idx];
 
-      // 初始化本段状态
       if (!segmentStates[idx]) {
         segmentStates[idx] = { image: false, translation: false, keyPoints: false };
       }
       const state = segmentStates[idx];
 
-      // 更新标题
       document.getElementById('currentIdx').textContent = idx + 1;
       document.getElementById('totalSegs').textContent = total;
 
