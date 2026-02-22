@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>古诗背诵助手 - 全平台兼容版 🎤</title>
+  <title>古诗背诵助手 - 全平台兼容优化版 🎤</title>
   <style>
     body {
       font-family: "Microsoft YaHei", sans-serif;
@@ -11,6 +11,7 @@
       background: #f9f7f0;
       line-height: 1.6;
       color: #333;
+      margin: 0;
     }
     select, textarea, button {
       width: 100%;
@@ -19,7 +20,7 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       box-sizing: border-box;
-      font-size: 16px; /* 防止 iOS 自动缩放 */
+      font-size: 16px; /* 防止 iOS 缩放 */
     }
     #previewArea {
       background: #fff;
@@ -108,10 +109,21 @@
       height: 100%;
       border-radius: 5px;
     }
+
+    /* 按钮组：并排 */
+    #actionButtons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    #actionButtons button {
+      flex: 1;
+      min-height: 44px; /* 触控友好 */
+    }
   </style>
 </head>
 <body>
-  <h1>古诗背诵助手 - 全平台兼容版 🎤</h1>
+  <h1>古诗背诵助手 - 全平台兼容优化版 🎤</h1>
   <p>选择篇目 → 确认原文 → 开始背诵 → 用<strong>键盘🎤</strong>语音输入，自动评分！</p>
 
   <label for="poemSelect">选择篇目：</label>
@@ -182,13 +194,15 @@
       ✅ 提交背诵并评分
     </button>
     
-    <div style="margin-top:15px;">
-      <button id="prevBtn" disabled>⬅️ 上一段</button>
-      <button id="nextBtn">下一段 ➡️</button>
-    </div>
-
     <!-- 语音反馈区 -->
     <div id="feedbackArea"></div>
+
+    <!-- 操作按钮组 -->
+    <div id="actionButtons">
+      <button id="prevBtn" disabled>⬅️ 上一段</button>
+      <button id="nextBtn">下一段 ➡️</button>
+      <button id="retryBtn" style="background:#f39c12; color:white; display:none;">🔁 重测本段</button>
+    </div>
   </div>
 
   <script>
@@ -210,31 +224,6 @@
         translation: `第${index+1}段现代翻译：此处可替换为真实译文...`,
         keyPoints: `• 考点占位\n• 第${index+1}段`
       }));
-    }
-
-    // === 高级比对引擎 ===
-    function advancedCompare(spoken, original) {
-      const cleanSpoken = spoken.replace(/[，。？！；：“”‘’\s]/g, '');
-      const cleanOriginal = original.replace(/[，。？！；：“”‘’\s]/g, '');
-
-      // 准确率
-      const editDist = levenshteinDistance(cleanSpoken, cleanOriginal);
-      const maxLength = Math.max(cleanSpoken.length, cleanOriginal.length);
-      const accuracy = maxLength > 0 ? Math.max(0, 100 - Math.round((editDist / maxLength) * 100)) : 0;
-
-      // 完整度
-      const originalWords = cleanOriginal.split('');
-      const spokenSet = new Set(cleanSpoken.split(''));
-      const covered = originalWords.filter(w => spokenSet.has(w)).length;
-      const completeness = originalWords.length > 0 ? Math.round((covered / originalWords.length) * 100) : 0;
-
-      // 流畅度（模拟）
-      const fluency = spoken.length > 5 ? Math.min(100, 80 + Math.random() * 20) : 50;
-
-      // 高亮差异
-      const highlighted = highlightDifferences(spoken, original);
-
-      return { accuracy, completeness, fluency, highlighted };
     }
 
     function levenshteinDistance(a, b) {
@@ -277,6 +266,26 @@
       if (score >= 90) return '#27ae60';
       if (score >= 70) return '#f39c12';
       return '#e74c3c';
+    }
+
+    function advancedCompare(spoken, original) {
+      const cleanSpoken = spoken.replace(/[，。？！；：“”‘’\s]/g, '');
+      const cleanOriginal = original.replace(/[，。？！；：“”‘’\s]/g, '');
+
+      const editDist = levenshteinDistance(cleanSpoken, cleanOriginal);
+      const maxLength = Math.max(cleanSpoken.length, cleanOriginal.length);
+      const accuracy = maxLength > 0 ? Math.max(0, 100 - Math.round((editDist / maxLength) * 100)) : 0;
+
+      const originalWords = cleanOriginal.split('');
+      const spokenSet = new Set(cleanSpoken.split(''));
+      const covered = originalWords.filter(w => spokenSet.has(w)).length;
+      const completeness = originalWords.length > 0 ? Math.round((covered / originalWords.length) * 100) : 0;
+
+      const fluency = spoken.length > 5 ? Math.min(100, 80 + Math.random() * 20) : 50;
+
+      const highlighted = highlightDifferences(spoken, original);
+
+      return { accuracy, completeness, fluency, highlighted };
     }
 
     function renderFeedback(result, spoken) {
@@ -350,18 +359,12 @@
       document.getElementById('startReciteBtn').style.display = 'block';
     }
 
-    function renderReciteInterface() {
-      // 隐藏前置界面
-      ['poemSelect', 'manualInput', 'previewArea', 'confirmBtn', 'backgroundPanel', 'startReciteBtn']
-        .forEach(id => document.getElementById(id).style.display = 'none');
-      document.querySelector('label[for="manualInput"]').style.display = 'none';
-
-      document.getElementById('reciteArea').style.display = 'block';
-      currentSegmentIndex = 0;
-      updateReciteSegment();
-    }
-
     function updateReciteSegment() {
+      if (!window.m3Data || currentSegmentIndex < 0 || currentSegmentIndex >= window.m3Data.length) {
+        console.warn("无效段落索引");
+        return;
+      }
+
       const data = window.m3Data[currentSegmentIndex];
       const total = window.m3Data.length;
       document.getElementById('currentIdx').textContent = currentSegmentIndex + 1;
@@ -388,8 +391,36 @@
 
       document.getElementById('prevBtn').disabled = currentSegmentIndex === 0;
       document.getElementById('nextBtn').disabled = currentSegmentIndex === total - 1;
+      
+      // 关键：隐藏重测和反馈
+      document.getElementById('retryBtn').style.display = 'none';
       document.getElementById('feedbackArea').style.display = 'none';
-      document.getElementById('speechInput').value = ''; // 清空输入框
+      document.getElementById('speechInput').value = '';
+    }
+
+    function renderReciteInterface() {
+      if (!window.m3Data || window.m3Data.length === 0) {
+        alert("请先确认原文！");
+        return;
+      }
+
+      // 隐藏前置界面
+      ['poemSelect', 'manualInput', 'previewArea', 'confirmBtn', 'backgroundPanel', 'startReciteBtn']
+        .forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+      const label = document.querySelector('label[for="manualInput"]');
+      if (label) label.style.display = 'none';
+
+      document.getElementById('reciteArea').style.display = 'block';
+      currentSegmentIndex = 0;
+      updateReciteSegment();
+      
+      // 自动滚动到顶部
+      setTimeout(() => {
+        document.getElementById('reciteArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     }
 
     // === 事件绑定 ===
@@ -397,18 +428,20 @@
     document.getElementById('manualInput').addEventListener('input', updatePreview);
     document.getElementById('confirmBtn').addEventListener('click', confirmYuanwen);
     document.getElementById('startReciteBtn').addEventListener('click', renderReciteInterface);
-    document.getElementById('prevBtn').addEventListener('click', () => {
-      if (currentSegmentIndex > 0) {
-        currentSegmentIndex--;
+
+    ['prevBtn', 'nextBtn'].forEach(btnId => {
+      document.getElementById(btnId).addEventListener('click', () => {
+        if (btnId === 'prevBtn' && currentSegmentIndex > 0) {
+          currentSegmentIndex--;
+        } else if (btnId === 'nextBtn' && currentSegmentIndex < window.m3Data.length - 1) {
+          currentSegmentIndex++;
+        }
         updateReciteSegment();
-      }
+        // 切换后滚动到顶部
+        document.getElementById('reciteArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
     });
-    document.getElementById('nextBtn').addEventListener('click', () => {
-      if (currentSegmentIndex < window.m3Data.length - 1) {
-        currentSegmentIndex++;
-        updateReciteSegment();
-      }
-    });
+
     ['Image', 'Translation', 'KeyPoints'].forEach(name => {
       document.getElementById(`toggle${name}`).addEventListener('click', () => {
         const key = name.toLowerCase();
@@ -416,6 +449,8 @@
         updateReciteSegment();
       });
     });
+
+    // 提交评估
     document.getElementById('submitSpeechBtn').addEventListener('click', () => {
       const spoken = document.getElementById('speechInput').value.trim();
       if (!spoken) {
@@ -425,6 +460,22 @@
       const original = window.m3Data[currentSegmentIndex].originalText;
       const result = advancedCompare(spoken, original);
       renderFeedback(result, spoken);
+
+      // 显示重测按钮
+      document.getElementById('retryBtn').style.display = 'block';
+      
+      // 自动滚动到反馈区
+      setTimeout(() => {
+        document.getElementById('feedbackArea').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    });
+
+    // 重测本段
+    document.getElementById('retryBtn').addEventListener('click', () => {
+      document.getElementById('speechInput').value = '';
+      document.getElementById('feedbackArea').style.display = 'none';
+      document.getElementById('retryBtn').style.display = 'none';
+      document.getElementById('speechInput').focus();
     });
   </script>
 </body>
