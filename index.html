@@ -3,15 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>古诗背诵助手 - 全平台兼容优化版 🎤</title>
+  <!-- 禁用缓存 -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>古诗背诵助手 - 中小学版 🌸</title>
   <style>
     body {
       font-family: "Microsoft YaHei", sans-serif;
       padding: 15px;
-      background: #f9f7f0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
       line-height: 1.6;
       color: #333;
       margin: 0;
+      min-height: 100vh;
     }
     select, textarea, button {
       width: 100%;
@@ -20,10 +28,10 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       box-sizing: border-box;
-      font-size: 16px; /* 防止 iOS 缩放 */
+      font-size: 16px;
     }
     #previewArea {
-      background: #fff;
+      background: rgba(255, 255, 255, 0.9);
       border: 1px dashed #ccc;
       padding: 15px;
       display: none;
@@ -34,7 +42,7 @@
       display: none;
       margin-top: 20px;
       padding: 15px;
-      background: #e8f4fc;
+      background: rgba(232, 244, 252, 0.9);
       border-left: 4px solid #3498db;
       border-radius: 6px;
     }
@@ -50,31 +58,57 @@
       font-size: 16px;
     }
 
-    /* M4 背诵界面 */
+    /* M4: 背诵界面 */
     #reciteArea {
       display: none;
       margin-top: 20px;
       padding: 20px;
-      background: #fff;
+      background: rgba(255, 255, 255, 0.92);
       border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      position: relative;
+      z-index: 10;
+    }
+    #reciteHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
     }
     #reciteTitle {
       color: #2c3e50;
-      margin-top: 0;
+      margin: 0;
+      font-size: 1.2em;
     }
-    .toggle-btns {
-      margin: 12px 0;
+
+    /* ✅ 修复：带状态反馈的单选圆点 */
+    .options-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      font-size: 0.9em;
     }
-    .toggle-btns button {
-      padding: 10px 14px;
-      margin-right: 8px;
-      margin-bottom: 8px;
-      border: none;
-      border-radius: 6px;
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       cursor: pointer;
-      font-weight: bold;
-      font-size: 14px;
+    }
+    input[type="radio"] {
+      display: none;
+    }
+    .radio-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid #e74c3c;
+      background: transparent;
+      transition: background 0.2s ease;
+    }
+    input[type="radio"]:checked + .radio-dot {
+      background: #e74c3c;
     }
 
     .speech-guide {
@@ -110,7 +144,6 @@
       border-radius: 5px;
     }
 
-    /* 按钮组：并排 */
     #actionButtons {
       display: flex;
       gap: 10px;
@@ -118,15 +151,17 @@
     }
     #actionButtons button {
       flex: 1;
-      min-height: 44px; /* 触控友好 */
+      min-height: 44px;
     }
   </style>
 </head>
 <body>
-  <h1>古诗背诵助手 - 全平台兼容优化版 🎤</h1>
-  <p>选择篇目 → 确认原文 → 开始背诵 → 用<strong>键盘🎤</strong>语音输入，自动评分！</p>
+  <!-- M0: 启动页 -->
+  <h1>古诗背诵助手 - 中小学版 🌸</h1>
+  <p>选篇目 → 看原文 → 分段背 → 用<strong>键盘🎤</strong>语音输入，AI 自动打分！</p>
 
-  <label for="poemSelect">选择篇目：</label>
+  <!-- M1: 输入模块 -->
+  <label for="poemSelect">📚 选择篇目：</label>
   <select id="poemSelect">
     <option value="">-- 请选择 --</option>
     <option value="晋太元中，武陵人捕鱼为业，缘溪行，忘路之远近。
@@ -137,7 +172,7 @@
 
 林尽水源，便得一山，山有小口，仿佛若有光。
 
-便舍船，从口入。初极狭，才通人。复行数十步，豁然开朗。">《桃花源记》</option>
+便舍船，从口入。初极狭，才通人。复行数十步，豁然开朗。">《桃花源记》节选</option>
     
     <option value="山不在高，有仙则名。水不在深，有龙则灵。
 
@@ -148,40 +183,46 @@
 无丝竹之乱耳，无案牍之劳形。南阳诸葛庐，西蜀子云亭。">《陋室铭》</option>
   </select>
 
-  <label for="manualInput">或粘贴原文：</label>
+  <label for="manualInput">✏️ 或粘贴原文：</label>
   <textarea id="manualInput" rows="6" placeholder="请在此粘贴带段落空行的古文全文..."></textarea>
 
+  <!-- M2: 预览确认模块 -->
   <div id="previewArea">
-    <strong>预览原文：</strong>
+    <strong>🔍 预览原文：</strong>
     <div id="previewText"></div>
   </div>
-
   <button id="confirmBtn" disabled>✅ 确认原文</button>
 
+  <!-- M3: 背景信息模块 -->
   <div id="backgroundPanel">
     <h3>📜 创作背景</h3>
     <div id="backgroundText"></div>
   </div>
-
   <button id="startReciteBtn">📖 开始背诵</button>
 
-  <!-- M4: 背诵界面 -->
+  <!-- M4: 背诵评测模块 -->
   <div id="reciteArea">
-    <h2 id="reciteTitle">📖 第 <span id="currentIdx">1</span> / <span id="totalSegs">0</span> 段</h2>
-    
-    <div class="toggle-btns">
-      <button id="toggleImage">🖼️ 显示配图</button>
-      <button id="toggleTranslation">💬 显示译文</button>
-      <button id="toggleKeyPoints">💡 显示考点</button>
+    <div id="reciteHeader">
+      <div id="reciteTitle">📖 第 <span id="currentIdx">1</span> / <span id="totalSegs">0</span> 段</div>
+      <div class="options-row">
+        <label class="radio-option">
+          <input type="radio" name="viewMode" value="translation">
+          <span class="radio-dot"></span>
+          <span>译文</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="viewMode" value="keyPoints">
+          <span class="radio-dot"></span>
+          <span>考点</span>
+        </label>
+      </div>
     </div>
 
-    <div id="imageContainer" style="display:none; margin:15px 0;"></div>
-    <div id="translationContainer" style="display:none; margin:15px 0;"></div>
-    <div id="keyPointsContainer" style="display:none;"></div>
+    <div id="contentContainer"></div>
     
     <div class="speech-guide">
-      🎤 <strong>如何语音输入？</strong><br>
-      1️⃣ 点击下方输入框 → 2️⃣ 弹出键盘后点击 <strong>键盘上的🎤麦克风</strong>（搜狗/讯飞/百度等输入法均有）→ 3️⃣ 朗读当前段落
+      🎤 <strong>怎么用语音输入？</strong><br>
+      1️⃣ 点下方输入框 → 2️⃣ 弹出键盘后点 <strong>🎤麦克风</strong>（搜狗/讯飞都有）→ 3️⃣ 大声读当前段落！
     </div>
     
     <textarea 
@@ -194,10 +235,8 @@
       ✅ 提交背诵并评分
     </button>
     
-    <!-- 语音反馈区 -->
     <div id="feedbackArea"></div>
 
-    <!-- 操作按钮组 -->
     <div id="actionButtons">
       <button id="prevBtn" disabled>⬅️ 上一段</button>
       <button id="nextBtn">下一段 ➡️</button>
@@ -217,13 +256,32 @@
       return text.split(/\n\s*\n/).map(p => p.trim()).filter(p => p !== '');
     }
 
+    // ✅ 更新：中小学生友好译文 + 标准化考点
     function generatePlaceholderM3Data(segments) {
-      return segments.map((originalText, index) => ({
-        originalText,
-        image: `https://picsum.photos/400/200?random=${index+1}`,
-        translation: `第${index+1}段现代翻译：此处可替换为真实译文...`,
-        keyPoints: `• 考点占位\n• 第${index+1}段`
-      }));
+      return segments.map((originalText, index) => {
+        const n = index + 1;
+
+        const translations = [
+          "渔人小哥划船迷路，突然闯进一片绝美桃花林！粉红花瓣飘满地～🌸",
+          "穿过山洞，眼前竟是一个与世隔绝的乌托邦！没有作业，没有考试，只有快乐村民～😎",
+          "山不用高，有仙就灵；房不用豪，有德就香～陋室也能变网红打卡地！🏠💫",
+          "谈笑全是学霸，来往没有学渣！弹琴读书，远离内卷，这才是理想生活啊～📚🧘"
+        ];
+
+        const keyPointsList = [
+          `【字词】缘：沿着、顺着\n【字词】鲜美：鲜艳美丽（不是好吃！）\n【字词】落英：落花\n【文化】“芳草鲜美，落英缤纷”：经典景物描写，常考赏析`,
+          `【字词】妻子：妻子和孩子\n【字词】绝境：与世隔绝的地方\n【句式】“不足为外人道也”：省略句，(桃花源人) 不值得对外人说\n【文化】“世外桃源”成语出处`,
+          `【句式】“……者，……也”：判断句，如“斯是陋室”=“这是一间陋室”\n【虚词】“之”：取消句子独立性，无实义\n【文化】“南阳诸葛庐，西蜀子云亭”：用名人故居类比，抬高自己`,
+          `【字词】鸿儒：大学问家\n【字词】白丁：平民，没功名的人\n【句式】“可以……”：省略主语“吾”，我能……`
+        ];
+
+        return {
+          originalText,
+          image: `https://picsum.photos/800/600?random=${n}`,
+          translation: translations[index] || `第${n}段超酷翻译正在加载中...🚀`,
+          keyPoints: keyPointsList[index] || `【字词】暂无考点\n【句式】敬请期待～`
+        };
+      });
     }
 
     function levenshteinDistance(a, b) {
@@ -324,6 +382,10 @@
       el.style.display = 'block';
     }
 
+    function updateBodyBackground(imageUrl) {
+      document.body.style.backgroundImage = `url(${imageUrl})`;
+    }
+
     // === 主流程 ===
     function updatePreview() {
       const selectVal = document.getElementById('poemSelect').value;
@@ -370,29 +432,27 @@
       document.getElementById('currentIdx').textContent = currentSegmentIndex + 1;
       document.getElementById('totalSegs').textContent = total;
 
-      if (!segmentStates[currentSegmentIndex]) {
-        segmentStates[currentSegmentIndex] = { image: false, translation: false, keyPoints: false };
+      updateBodyBackground(data.image);
+
+      const viewMode = segmentStates[currentSegmentIndex]?.viewMode || null;
+      const contentContainer = document.getElementById('contentContainer');
+      
+      if (viewMode === 'translation') {
+        contentContainer.innerHTML = `<div style="margin:10px 0;"><strong>💬 译文：</strong><p>${data.translation}</p></div>`;
+      } else if (viewMode === 'keyPoints') {
+        contentContainer.innerHTML = `<div style="margin:10px 0;"><strong>💡 考点：</strong><pre>${data.keyPoints}</pre></div>`;
+      } else {
+        contentContainer.innerHTML = '';
       }
-      const state = segmentStates[currentSegmentIndex];
 
-      document.getElementById('imageContainer').innerHTML = `
-        <img src="${data.image}" style="width:100%; max-width:400px; height:auto; border-radius:8px;" 
-             onerror="this.parentElement.innerHTML='<p style=\"color:#e74c3c;\">⚠️ 图片加载失败</p>';">`;
-      document.getElementById('translationContainer').innerHTML = `<p>${data.translation}</p>`;
-      document.getElementById('keyPointsContainer').innerHTML = `<pre>${data.keyPoints}</pre>`;
-
-      ['image', 'translation', 'keyPoints'].forEach(key => {
-        const el = document.getElementById(`${key}Container`);
-        el.style.display = state[key] ? 'block' : 'none';
-        document.getElementById(`toggle${key.charAt(0).toUpperCase() + key.slice(1)}`).textContent = 
-          state[key] ? `隐藏${['配图','译文','考点'][['image','translation','keyPoints'].indexOf(key)]}` 
-                     : `显示${['配图','译文','考点'][['image','translation','keyPoints'].indexOf(key)]}`;
+      // 同步单选按钮状态
+      document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
+        radio.checked = (radio.value === viewMode);
       });
 
       document.getElementById('prevBtn').disabled = currentSegmentIndex === 0;
       document.getElementById('nextBtn').disabled = currentSegmentIndex === total - 1;
       
-      // 关键：隐藏重测和反馈
       document.getElementById('retryBtn').style.display = 'none';
       document.getElementById('feedbackArea').style.display = 'none';
       document.getElementById('speechInput').value = '';
@@ -404,7 +464,6 @@
         return;
       }
 
-      // 隐藏前置界面
       ['poemSelect', 'manualInput', 'previewArea', 'confirmBtn', 'backgroundPanel', 'startReciteBtn']
         .forEach(id => {
           const el = document.getElementById(id);
@@ -417,7 +476,6 @@
       currentSegmentIndex = 0;
       updateReciteSegment();
       
-      // 自动滚动到顶部
       setTimeout(() => {
         document.getElementById('reciteArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
@@ -437,20 +495,20 @@
           currentSegmentIndex++;
         }
         updateReciteSegment();
-        // 切换后滚动到顶部
         document.getElementById('reciteArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
 
-    ['Image', 'Translation', 'KeyPoints'].forEach(name => {
-      document.getElementById(`toggle${name}`).addEventListener('click', () => {
-        const key = name.toLowerCase();
-        segmentStates[currentSegmentIndex][key] = !segmentStates[currentSegmentIndex][key];
+    document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (!segmentStates[currentSegmentIndex]) {
+          segmentStates[currentSegmentIndex] = {};
+        }
+        segmentStates[currentSegmentIndex].viewMode = radio.value;
         updateReciteSegment();
       });
     });
 
-    // 提交评估
     document.getElementById('submitSpeechBtn').addEventListener('click', () => {
       const spoken = document.getElementById('speechInput').value.trim();
       if (!spoken) {
@@ -461,16 +519,13 @@
       const result = advancedCompare(spoken, original);
       renderFeedback(result, spoken);
 
-      // 显示重测按钮
       document.getElementById('retryBtn').style.display = 'block';
       
-      // 自动滚动到反馈区
       setTimeout(() => {
         document.getElementById('feedbackArea').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }, 100);
     });
 
-    // 重测本段
     document.getElementById('retryBtn').addEventListener('click', () => {
       document.getElementById('speechInput').value = '';
       document.getElementById('feedbackArea').style.display = 'none';
