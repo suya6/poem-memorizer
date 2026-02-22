@@ -207,7 +207,7 @@
     window.m3Data = [];
     window.poemMeta = null;
     let currentSegmentIndex = 0;
-    const segmentStates = {}; // 记录每段的展开状态
+    const segmentStates = {};
 
     // === M1: 预览 ===
     function updatePreview() {
@@ -243,7 +243,6 @@
       return segments.map((_, index) => {
         const i = index + 1;
         return {
-          // ✅ 使用 picsum.photos，避免 via.placeholder.com 的 DNS 问题
           image: `https://picsum.photos/id/${i % 600 + 1}/400/200`,
           translation: `宝子！第${i}段来啦～你就说：“这里放超有梗的现代翻译...” 💬`,
           keyPoints: `💡考点速记：\n• 字词：解释（开发占位，第${i}段）\n• 句式：待填充`
@@ -294,7 +293,7 @@
     function renderReciteInterface() {
       if (!window.m3Data || window.m3Data.length === 0) return;
 
-      // ✅ 隐藏所有 M0-M3 元素
+      // 隐藏所有 M0-M3 元素
       document.getElementById('poemSelect').style.display = 'none';
       const manualLabel = document.querySelector('label[for="manualInput"]');
       if (manualLabel) manualLabel.style.display = 'none';
@@ -350,7 +349,6 @@
     document.getElementById('manualInput').addEventListener('input', updatePreview);
     document.getElementById('confirmBtn').addEventListener('click', confirmYuanwen);
 
-    // M4 控制
     document.getElementById('startReciteBtn').addEventListener('click', function() {
       if (!window.m3Data || window.m3Data.length === 0) {
         alert("请先确认原文！");
@@ -374,7 +372,6 @@
       }
     });
 
-    // 切换显示/隐藏
     document.getElementById('toggleImage').addEventListener('click', function() {
       segmentStates[currentSegmentIndex].image = !segmentStates[currentSegmentIndex].image;
       updateReciteSegment();
@@ -392,5 +389,3 @@
   </script>
 </body>
 </html>
-
-
